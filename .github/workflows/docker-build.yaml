@@ -1,7 +1,5 @@
 name: build-docker
-
 on: [push]
-
 jobs:
   build-docker-image:
     runs-on: ubuntu-latest
@@ -26,3 +24,16 @@ jobs:
           tags: |
             thomctrs/my-app-getting:latest
             thomctrs/my-app-getting:${{ github.sha }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          name: Release ${{ github.ref_name }}
+          body: |
+            Release de my-app-getting
+            Docker image: thomctrs/my-app-getting:${{ github.sha }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

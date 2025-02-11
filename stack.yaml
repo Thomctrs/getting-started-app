@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'EC2 instance with Docker and getting-started-app'
+
+Parameters:
+  InstanceType:
+    Description: EC2 instance type
+    Type: String
+    Default: t2.micro
+  
+  ImageId:
+    Description: AMI ID for the EC2 instance
+    Type: String
+    Default: ami-0fcc1d7ed380d3549
+
+  SecurityGroupId:  # Corrected indentation
+    Description: Security Group ID
+    Type: AWS::EC2::SecurityGroup::Id
+    Default: sg-042896fe2dea4c357
+
+Resources:
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref ImageId
+      InstanceType: !Ref InstanceType
+      Tags:
+        - Key: Name
+          Value: gp8-tp3
+      SecurityGroupIds: 
+        - !Ref SecurityGroupId  # Corrected reference
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          sudo yum update -y
+          sudo yum install -y docker
+          sudo service docker start
+          sudo usermod -a -G docker ec2-user
+          sudo systemctl enable docker
+          sudo docker pull bapju/getting-started-app
+          sudo docker run -d -p 80:3000 bapju/getting-started-app
+
+Outputs:
+  PublicIP:
+    Description: Public IP of the EC2 instance
+    Value: !GetAtt EC2Instance.PublicIp
+  PublicDNS:
+    Description: Public DNS of the EC2 instance
+    Value: !GetAtt EC2Instance.PublicDnsName

@@ -44,3 +44,4 @@ jobs:
             - Docker image: thomctrs/my-app-getting:${{ github.sha }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
